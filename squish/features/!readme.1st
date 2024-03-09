@@ -1,0 +1,11 @@
+This directory contains the sample feature DLLs for Squish.  Makefiles
+are provided only for WATCOM C/16 and WATCOM C/32.
+
+To build the 16-bit feature DLLs using WATCOM C/16, type:
+
+        wmake -f makefile.wco
+
+To build the 32-bit feature DLLs using WATCOM C/32, type:
+
+        wmake -f makefile.w3o
+

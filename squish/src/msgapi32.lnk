@@ -1,0 +1,49 @@
+deb all
+sys os2v2 dll initi
+name msgapi32.dll
+
+opt verb
+opt map=msgapi32.map
+
+file
+{
+        msgapi.obj
+        bld.obj
+
+        api_sdm.obj         sq_area.obj         sq_msg.obj
+        sq_read.obj         sq_write.obj
+        sq_kill.obj         sq_uid.obj          sq_lock.obj
+        sq_misc.obj         sq_help.obj         sq_idx.obj
+
+        1stchar.obj cvtdate.obj date2bin.obj dosdate.obj fexist.obj
+        ffind.obj flush.obj months.obj w3_misc.obj parsenn.obj
+        qksort.obj stristr.obj strocpy.obj trail.obj nopen.obj
+        setfsize.obj tdelay.obj
+}
+
+lib os2386
+
+opt modname=msgapi32
+
+export MsgOpenArea.1
+export MsgOpenApi.2
+export MsgValidate.3
+export MsgCloseApi.4
+export ConvertControlInfo.5
+export CopyToControlBuf.6
+export CvtCtrlToKludge.7
+export GetCtrlToken.8
+export NumKludges.9
+export RemoveFromCtrl.10
+export SquishSetMaxMsg.11
+export WriteZPInfo.12
+export _msgapierr.13
+export SquishHash.14
+export InvalidMh.15
+export InvalidMsgh.16
+export MsgFreeCtrlToken.17
+export MsgFreeCtrlBuf.18
+
+opt case,many,newf
+#opt protmode,stack=0,heap=0,nodef
+

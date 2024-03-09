@@ -1,0 +1,8 @@
+api_sdm.obj  bld.obj       msgapi.obj    sq_area.obj   sq_help.obj      +
+sq_idx.obj    sq_kill.obj   sq_lock.obj   sq_misc.obj   sq_msg.obj      +
+sq_read.obj   sq_uid.obj    sq_write.obj  1stchar.obj   cvtdate.obj     +
+date2bin.obj  dosdate.obj   fexist.obj    ffind.obj     flush.obj       +
+months.obj    parsenn.obj   qksort.obj    stristr.obj   strocpy.obj     +
+trail.obj     _ctype.obj    nopen.obj     setfsize.obj  strftim.obj     +
+ffinda.obj    tdelay.obj    sqasm.obj     share.obj     weekday.obj     +
+mc_misc.obj

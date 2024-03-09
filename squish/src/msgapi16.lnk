@@ -1,0 +1,52 @@
+# $Id: MSGAPI16.LNK 1.4 1994/04/01 12:16:02 sjd Exp sjd $
+
+system os2 dll initi
+
+debug all
+name msgapi.dll
+opt modname=msgapi
+#opt symf=msgapi
+
+opt verb
+opt map=msgapi.map
+
+file msgapi.obj, bld.obj, api_sdm.obj
+
+file sq_area.obj, sq_msg.obj, sq_read.obj, sq_lock.obj, sq_misc.obj
+file sq_write.obj, sq_kill.obj, sq_uid.obj, sq_help.obj, sq_idx.obj
+
+file 1stchar.obj, cvtdate.obj, date2bin.obj, dosdate.obj, fexist.obj
+file ffind.obj, flush.obj, months.obj, wc_misc.obj, parsenn.obj
+file qksort.obj, stristr.obj, strocpy.obj, trail.obj
+file nopen.obj, setfsize.obj, tdelay.obj
+
+lib clibdll, doscalls.lib
+
+segment class 'CODE' preload executeread share
+
+export MSGOPENAREA.1
+export MSGOPENAPI.2
+export MSGVALIDATE.3
+export MSGCLOSEAPI.4
+export CONVERTCONTROLINFO.5
+export COPYTOCONTROLBUF.6
+export CVTCTRLTOKLUDGE.7
+export GETCTRLTOKEN.8
+export NUMKLUDGES.9
+export REMOVEFROMCTRL.10
+export SQUISHSETMAXMSG.11
+export WRITEZPINFO.12
+export _msgapierr.13
+export SQUISHHASH.14
+export INVALIDMH.15
+export INVALIDMSGH.16
+export MSGFREECTRLTOKEN.17
+export MSGFREECTRLBUF.18
+
+#opt caseexact
+opt nodefaultlibs,newf
+opt protmode
+#opt stack=0
+#opt heap=0
+opt manyautodata
+

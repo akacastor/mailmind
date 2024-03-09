@@ -1,0 +1,29 @@
+# Feature DLL makefile for WATCOM C, 32-bit OS/2
+
+all: .SYMBOLIC msgtra32.dll killrc32.dll templa32.dll
+
+
+
+templa32.dll: templa32.obj
+        wlink @templa32
+
+templa32.obj: template.c
+        wcc386 /bd /dOS_2 /fo=templa32 template.c
+
+
+msgtra32.dll: msgtra32.obj
+        wlink @msgtra32
+
+msgtra32.obj: msgtrack.c
+        wcc386 /bd /dOS_2 /fo=msgtra32 msgtrack.c
+
+
+killrc32.dll: killrc32.obj
+        wlink @killrc32
+
+killrc32.obj: killrcat.c
+        wcc386 /bd /dOS_2 /fo=killrc32 killrcat.c
+
+
+clean: .SYMBOLIC
+        -del *.obj *.dll

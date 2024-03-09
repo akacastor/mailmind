@@ -1,0 +1,27 @@
+# Sampels makefile for Turbo C, 16-bit DOS
+
+
+# Path to your Turbo C directory
+
+TCDIR = c:\tc30
+
+all: sqconv.exe killrcat.exe sstat.exe
+
+sqconv.exe: sqconv.obj
+        tlink $(TCDIR)\lib\c0l $*,$<,nul,..\lib\tc_dos_l.lib $(TCDIR)\lib\cl
+
+killrcat.exe: killrcat.obj
+        tlink $(TCDIR)\lib\c0l $*,$<,nul,..\lib\tc_dos_l.lib $(TCDIR)\lib\cl
+
+sstat.exe: sstat.obj address.obj smalloc.obj parsenn.obj shfopen.obj 1stchar.obj
+        tlink $(TCDIR)\lib\c0l @l.tcd,$*,,$(TCDIR)\lib\emu $(TCDIR)\lib\mathl $(TCDIR)\lib\cl ..\lib\tc_dos_l.lib
+
+.c.obj:
+        tcc -ml -I..\h -c $<
+
+clean:
+        -del *.obj
+        -del *.exe
+        -del _*.lnk
+        -del *.err
+

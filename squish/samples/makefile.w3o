@@ -1,0 +1,19 @@
+# Samples makefile for WATCOM C, 32-bit OS/2
+
+all: .SYMBOLIC sqconv.exe killrcat.exe sstat.exe
+
+sqconv.exe: sqconv.obj
+        wlink opt quiet deb all sys os2v2 n sqconv f {$<} lib ..\lib\dll32 opt st=16k
+
+killrcat.exe: killrcat.obj
+        wlink opt quiet deb all sys os2v2 n killrcat f killrcat lib ..\lib\dll32 opt st=16k
+
+sstat.exe: sstat.obj address.obj smalloc.obj parsenn.obj shfopen.obj 1stchar.obj
+        wlink opt quiet deb all sys os2v2 n $* f {$<} lib ..\lib\dll32 opt st=16k
+
+.c.obj:
+        wcc386 /dOS_2 /zp1 /mf /d2 /W4 /I..\h /Zq $<
+
+clean: .SYMBOLIC
+        -del *.obj *.exe *.err _*.lnk
+

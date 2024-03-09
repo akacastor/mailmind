@@ -1,0 +1,22 @@
+컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+Squish Developers Kit
+Version 2.0
+컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
+This archive contains the source and object code for the
+Squish/Maximus message API, in addition to a specification for
+the Squish file format and information on designing feature .DLLs
+for the OS/2 version of Squish.
+
+The complete API and file format documentation is contained in
+SQDEV.PRN.  Please print out and read this documentation before
+trying to use the Squish Developers Kit.
+
+Scott Dudley
+May 23th, 1994
+
+FidoNet:    1:249/106
+Internet:   sjd@f106.n249.z1.fidonet.org
+CompuServe: >INTERNET:sjd@f106.n249.z1.fidonet.org
+BBS:        (613) 634-3058, V.32bis
+

@@ -1,0 +1,7 @@
+sys os2 dll initi
+debug all
+name killrcat.dll
+file killrcat.obj
+lib os2
+opt manyauto,protmode,verb,modname=killrcat
+

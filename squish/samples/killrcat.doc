@@ -1,0 +1,42 @@
+KillrCat
+========
+
+This is a five-minute hack (and it probably shows) that acts as a
+KILLRDOG replacement for Squish bases.  Use at your own risk.
+
+
+Distribution files
+==================
+
+KILLRCAT.EXE - KillrCat for MS-DOS
+KILLRCAP.EXE - KillrCap for OS/2
+KILLRCAT.C   - C source code
+KILLRCAT.H   - Header file
+
+KILLRCAT is reasonably generic.  However, you need MSGAPI if you
+wish to recompile it.
+
+
+Configuration file format
+=========================
+
+AREA <area>
+        <flag>  <text>
+        ...
+
+<area> should be the path of the area to scan.  To scan a Squish area,
+include a '$' in front of the area's path.
+
+<flag> can be either 't', 'f', 's' or 'b', indicating that KillrCat
+is to search the TO field, the FROM field, the SUBJECT field,
+or the BODY (respectively).
+
+<text> indicates the text that KillrCat is to delete.  Any messages
+which match the specified criteria will get nuked.
+
+You can specify more than one flag/text combination per area, but
+you can only put one on a line.  Put a blank line after the last
+one before starting a new area definition.
+
+This program is public domain.
+

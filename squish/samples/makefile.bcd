@@ -1,0 +1,26 @@
+# Samples makefile for Borland C, 16-bit DOS
+
+# Path to your Borland C directory
+
+BCDIR = c:\borlandc
+
+all: sqconv.exe killrcat.exe sstat.exe
+
+sqconv.exe: sqconv.obj
+        tlink $(BCDIR)\lib\c0l $*,$<,nul,..\lib\bc_dos_l.lib $(BCDIR)\lib\cl
+
+killrcat.exe: killrcat.obj
+        tlink $(BCDIR)\lib\c0l $*,$<,nul,..\lib\bc_dos_l.lib $(BCDIR)\lib\cl
+
+sstat.exe: sstat.obj address.obj smalloc.obj parsenn.obj shfopen.obj 1stchar.obj
+        tlink $(BCDIR)\lib\c0l @l.tcd,$*,,$(BCDIR)\lib\emu $(BCDIR)\lib\mathl $(BCDIR)\lib\cl ..\lib\bc_dos_l.lib
+
+.c.obj:
+        bcc -ml -I..\h -c $<
+
+clean:
+        -del *.obj
+        -del *.exe
+        -del _*.lnk
+        -del *.err
+

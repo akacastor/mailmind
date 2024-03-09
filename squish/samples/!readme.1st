@@ -1,0 +1,16 @@
+The following commands can be used to build the MsgAPI sample files:
+
+Compiler                Command
+----------------------- ------------------------------------------------------
+Turbo C (DOS)           make -fmakefile.tcd
+Borland C (DOS)         make -fmakefile.bcd
+
+Microsoft C (DOS)       nmake -f makefile.mcd
+Microsoft C (OS/2)      nmake -f makefile.mco
+
+WATCOM C/16 (DOS)       wmake -u -f makefile.wcd
+WATCOM C/16 (OS/2)      wmake -u -f makefile.wco
+
+WATCOM C/32 (DOS)       wmake -u -f makefile.w3d
+WATCOM C/32 (OS/2)      wmake -u -f makefile.w3o
+

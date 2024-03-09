@@ -1,0 +1,24 @@
+# Samples makefile for Microsoft C6, 16-bit OS/2
+
+
+# Path to your Microsoft C LIBRARY directory
+
+C6PATH = c:\c6\lib
+
+all: sqconv.exe killrcat.exe sstat.exe
+
+sqconv.exe: sqconv.obj
+        link sqconv,$*,nul,..\lib\dll16 $(C6PATH)\llibcp $(C6PATH)\em $(C6PATH)\libh /st:32768;
+
+killrcat.exe: killrcat.obj
+        link killrcat,$*,nul,..\lib\dll16 $(C6PATH)\llibcp $(C6PATH)\em $(C6PATH)\libh /st:32768;
+
+sstat.exe: sstat.obj address.obj smalloc.obj parsenn.obj shfopen.obj 1stchar.obj _ctype.obj
+        link sstat address smalloc parsenn shfopen 1stchar _ctype,$*,nul,..\lib\dll16 $(C6PATH)\llibfp $(C6PATH)\em $(C6PATH)\libh $(C6PATH)\llibcp /st:32768;
+
+.c.obj:
+        cl /nologo /c /DOS_2 /Od /W4 /Gs /Gr /Zi /AL /I..\h $<
+
+clean:
+        -del *.obj *.exe *.err _*.lnk
+

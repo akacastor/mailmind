@@ -1,0 +1,29 @@
+# Feature DLL makefile for WATCOM C, 16-bit OS/2
+
+all: .SYMBOLIC msgtrack.dll killrcat.dll template.dll
+
+
+
+template.dll: template.obj
+        wlink @template
+
+template.obj: template.c
+        wcc /bd /dOS_2 /ml /zu template.c
+
+
+msgtrack.dll: msgtrack.obj
+        wlink @msgtrack
+
+msgtrack.obj: msgtrack.c
+        wcc /bd /dOS_2 /ml /zu msgtrack.c
+
+
+killrcat.dll: killrcat.obj
+        wlink @killrcat
+
+killrcat.obj: killrcat.c
+        wcc /bd /dOS_2 /ml /zu killrcat.c
+
+
+clean: .SYMBOLIC
+        -del *.obj *.dll

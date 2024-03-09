@@ -1,0 +1,7 @@
+sys os2v2 dll initi
+debug all
+name msgtra32.dll
+file msgtra32.obj
+lib os2386
+opt verb,manyauto,modname=msgtra32
+

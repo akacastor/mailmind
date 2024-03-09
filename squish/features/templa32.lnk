@@ -1,0 +1,7 @@
+sys os2v2 dll initi
+debug all
+name templa32.dll
+file templa32.obj
+lib os2386
+opt verb,manyauto,modname=templa32
+

@@ -1,0 +1,8 @@
+sys os2v2 dll initi
+debug all
+name killrc32.dll
+file killrc32.obj
+lib os2386
+opt verb,manyauto,modname=killrc32
+
+
