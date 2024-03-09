@@ -13,7 +13,7 @@ ASM = wasm
 MODEL = l       # large
 
 # options to use
-INC =  -i=..\squish\h -i=..\max
+#INC =  -i=squish\h -i=..\max
 CFLAGS = -m$(MODEL) -zq -wx $(INC)
 AFLAGS = -zq
 #LNKOPT = option quiet

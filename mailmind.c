@@ -50,6 +50,30 @@ struct _user
 };
 
 
+struct _notifyuser
+{
+    long useridx;       // index into MailUsers
+    
+    byte from[XMSG_FROM_SIZE];
+    byte to[XMSG_TO_SIZE];
+    byte subj[XMSG_SUBJ_SIZE];
+    NETADDR orig;        /* Origination and destination addresses             */
+    NETADDR dest;
+    struct _stamp date_written;   /* When user wrote the msg (UTC)            */
+    struct _stamp date_arrived;   /* When msg arrived on-line (UTC)           */
+    sword utc_ofs;                /* Offset from UTC of message writer, in    *
+                                   * minutes.                                 */
+    char *msg_text;
+    long msg_len;
+    
+    char *echo_tag;
+    char *area_name;
+    char *area_descript;
+
+    word area_attribs;            /* Attributes for this area                       24*/
+};
+
+
 // https://stackoverflow.com/questions/122616/how-do-i-trim-leading-trailing-whitespace-in-a-standard-way
 // Sep 23 '08 at 18:12, Adam Rosenfield
 // Note: This function returns a pointer to a substring of the original string.
@@ -110,7 +134,7 @@ int search_for_new_mail( MAREA *marea,
     char OutFilename_emo[FILENAME_MAX] = "";
     char OutFilename_eao[FILENAME_MAX] = "";
     int MailUserIdx;
-    struct _user *NotifyUsers = NULL;
+    struct _notifyuser *NotifyUsers = NULL;
     int NumNotifyUsers = 0;
     int file_idx;
     FILE *MailuserCfgFile;
@@ -244,24 +268,55 @@ int search_for_new_mail( MAREA *marea,
                                                         xmsg.date_written.time.hh, xmsg.date_written.time.mm, xmsg.date_written.time.ss);
                         printf( "\n" );
 
-// add this MailUser to the notify list
-                        for( i=0; i<NumNotifyUsers; i++ )
+// add to the notify list
+                        NumNotifyUsers++;
+                        NotifyUsers = realloc( NotifyUsers, NumNotifyUsers*sizeof(struct _notifyuser) );
+                        if( !NotifyUsers )
                         {
-                            if( &NotifyUsers[i] == &MailUsers[MailUserIdx] )
-                                break;
+                            printf( "error - unable to allocate %d bytes for NotifyUsers[] - lost notify list.\n", NumNotifyUsers*sizeof(struct _user) );
+                            NumNotifyUsers = 0;
                         }
-                        if( i>= NumNotifyUsers )                            
-                        {   // MailUsers[MailUserIdx] isn't in NotifyUsers[] - add it
-                            NumNotifyUsers++;
-                            NotifyUsers = realloc( NotifyUsers, NumNotifyUsers*sizeof(struct _user) );
-                            if( NotifyUsers )
-                                NotifyUsers[NumNotifyUsers-1] = MailUsers[MailUserIdx];
-                            else
-                            {
-                                printf( "error - unable to allocate %d bytes for NotifyUsers[] - lost notify list.\n", NumNotifyUsers*sizeof(struct _user) );
-                                NumNotifyUsers = 0;
-                            }
+
+                        i = NumNotifyUsers-1;
+
+                        memset( &NotifyUsers[i], 0, sizeof(struct _notifyuser) );
+
+                        NotifyUsers[i].useridx = MailUserIdx;
+
+                        strncpy( NotifyUsers[i].from, xmsg.from, XMSG_FROM_SIZE );
+                        NotifyUsers[i].from[XMSG_FROM_SIZE-1] = '\0';
+                        strncpy( NotifyUsers[i].to, MsgTo, XMSG_TO_SIZE );
+                        NotifyUsers[i].to[XMSG_TO_SIZE-1] = '\0';
+                        strncpy( NotifyUsers[i].subj, xmsg.subj, XMSG_SUBJ_SIZE );
+                        NotifyUsers[i].subj[XMSG_SUBJ_SIZE-1] = '\0';
+                        NotifyUsers[i].orig = xmsg.orig;
+                        NotifyUsers[i].dest = xmsg.dest;
+                        NotifyUsers[i].date_written = xmsg.date_written;
+                        NotifyUsers[i].date_arrived = xmsg.date_arrived;
+                        NotifyUsers[i].utc_ofs = xmsg.utc_ofs;
+                        
+                        NotifyUsers[i].msg_text = (char *)calloc(sizeof(char), MsgLen);
+                        if( !NotifyUsers[i].msg_text )
+                            printf( "error allocating %d bytes for msg_text\n", MsgLen );
+                        else
+                        {
+                            memmove( NotifyUsers[i].msg_text, MsgBuf, MsgLen );
+                            NotifyUsers[i].msg_len = MsgLen;
                         }
+
+                        NotifyUsers[i].echo_tag = (char *)calloc(sizeof(char), strlen(marea_heap_ptr[AreaIdx]+marea[AreaIdx].echo_tag)+1 );
+                        if( NotifyUsers[i].echo_tag )
+                            strcpy( NotifyUsers[i].echo_tag, marea_heap_ptr[AreaIdx]+marea[AreaIdx].echo_tag );
+
+                        NotifyUsers[i].area_name = (char *)calloc(sizeof(char), strlen(marea_heap_ptr[AreaIdx]+marea[AreaIdx].name)+1 );
+                        if( NotifyUsers[i].area_name )
+                            strcpy( NotifyUsers[i].area_name, marea_heap_ptr[AreaIdx]+marea[AreaIdx].name );
+
+                        NotifyUsers[i].area_descript = (char *)calloc(sizeof(char), strlen(marea_heap_ptr[AreaIdx]+marea[AreaIdx].descript)+1 );
+                        if( NotifyUsers[i].area_descript )
+                            strcpy( NotifyUsers[i].area_descript, marea_heap_ptr[AreaIdx]+marea[AreaIdx].descript );
+
+                        NotifyUsers[i].area_attribs = marea[AreaIdx].attribs;
                     }
                 }
             }
@@ -325,9 +380,9 @@ int search_for_new_mail( MAREA *marea,
 
     for( i=0; i<NumNotifyUsers; i++ )
     {
-        printf( "Notify: %s\n", NotifyUsers[i].username );
+        printf( "Notify: %s\n", MailUsers[NotifyUsers[i].useridx].username );
         
-        if( NotifyUsers[i].unsubscribed )
+        if( MailUsers[NotifyUsers[i].useridx].unsubscribed )
         {
             printf( "User is unsubscribed - not sending notification email.\n" );
             continue;
@@ -341,7 +396,7 @@ int search_for_new_mail( MAREA *marea,
             if( OutFile )
                 fclose( OutFile );
             file_idx++;
-            sprintf( OutFilename_eao, "%s%08lX.EAO", OutFilename, SquishHash( NotifyUsers[i].email ) + file_idx );
+            sprintf( OutFilename_eao, "%s%08lX.EAO", OutFilename, SquishHash( MailUsers[NotifyUsers[i].useridx].email ) + file_idx );
             OutFile = fopen( OutFilename_emo, "rt" );
         }while( OutFile );
         // OutFilename is a filename that doesn't already exist    
@@ -351,11 +406,69 @@ int search_for_new_mail( MAREA *marea,
             printf( "error - unable to open '%s' for writing.\n", OutFilename_eao );
             continue;
         }        
-        fprintf( OutFile, "To: %s\n", NotifyUsers[i].email );
+        fprintf( OutFile, "To: %s\n", MailUsers[NotifyUsers[i].useridx].email );
         fprintf( OutFile, "From: Another Millennium BBS <anothermillenniumbbs@gmail.com>\n" );
         fprintf( OutFile, "Subject: New mail notification\n" );
         fprintf( OutFile, "\n" );
         fprintf( OutFile, "You have new mail waiting at Another Millennium BBS.\n" );
+        fprintf( OutFile, "\n" );
+//NotifyUsers[i].area_attribs
+        if( NotifyUsers[i].area_name )
+            fprintf( OutFile, "Area: %s", NotifyUsers[i].area_name );
+        if( NotifyUsers[i].echo_tag )
+        {
+            if( NotifyUsers[i].area_name )
+                fprintf( OutFile, " " );
+            fprintf( OutFile, "(%s)", NotifyUsers[i].echo_tag );
+        }
+        if( NotifyUsers[i].area_descript )
+        {
+            if( NotifyUsers[i].area_name || NotifyUsers[i].echo_tag )
+                fprintf( OutFile, " " );
+            fprintf( OutFile, "%s", NotifyUsers[i].area_descript );
+        }
+        if( NotifyUsers[i].echo_tag || NotifyUsers[i].area_name || NotifyUsers[i].area_descript )
+            fprintf( OutFile, "\n\n" );
+        fprintf( OutFile, "From: %s", NotifyUsers[i].from );
+        if( NotifyUsers[i].orig.zone && ( (NotifyUsers[i].area_attribs&MA_NET)||(NotifyUsers[i].area_attribs&MA_ECHO)||(NotifyUsers[i].area_attribs&MA_CONF) ) )
+        {
+            fprintf( OutFile, " (%d:%d/%d", NotifyUsers[i].orig.zone, NotifyUsers[i].orig.net, NotifyUsers[i].orig.node );
+            if( NotifyUsers[i].orig.point )
+                fprintf( OutFile, ".%d", NotifyUsers[i].orig.point );
+            fprintf( OutFile, ")" );
+            
+        }
+        fprintf( OutFile, "\n" );
+        fprintf( OutFile, "To:   %s", NotifyUsers[i].to );
+        if( NotifyUsers[i].dest.zone && (NotifyUsers[i].area_attribs&MA_NET) )
+        {
+            fprintf( OutFile, " (%d:%d/%d", NotifyUsers[i].dest.zone, NotifyUsers[i].dest.net, NotifyUsers[i].dest.node );
+            if( NotifyUsers[i].dest.point )
+                fprintf( OutFile, ".%d", NotifyUsers[i].dest.point );
+            fprintf( OutFile, ")" );
+            
+        }   
+        fprintf( OutFile, "\n" );
+        fprintf( OutFile, "Subj: %s\n", NotifyUsers[i].subj );
+
+        if( (NotifyUsers[i].area_attribs&MA_NET)||(NotifyUsers[i].area_attribs&MA_ECHO)||(NotifyUsers[i].area_attribs&MA_CONF) )
+        {
+            fprintf( OutFile, "Date written: %02d/%02d/%02d %02d:%02d:%02d\n", NotifyUsers[i].date_written.date.mo, NotifyUsers[i].date_written.date.da, (NotifyUsers[i].date_written.date.yr+1980)%100, NotifyUsers[i].date_written.time.hh, NotifyUsers[i].date_written.time.mm, NotifyUsers[i].date_written.time.ss );
+            fprintf( OutFile, "Date arrived: %02d/%02d/%02d %02d:%02d:%02d\n", NotifyUsers[i].date_arrived.date.mo, NotifyUsers[i].date_arrived.date.da, (NotifyUsers[i].date_arrived.date.yr+1980)%100, NotifyUsers[i].date_arrived.time.hh, NotifyUsers[i].date_arrived.time.mm, NotifyUsers[i].date_arrived.time.ss );
+        }
+        else
+            fprintf( OutFile, "Date: %02d/%02d/%02d %02d:%02d:%02d\n", NotifyUsers[i].date_written.date.mo, NotifyUsers[i].date_written.date.da, (NotifyUsers[i].date_written.date.yr+1980)%100, NotifyUsers[i].date_written.time.hh, NotifyUsers[i].date_written.time.mm, NotifyUsers[i].date_written.time.ss );
+
+        fprintf( OutFile, "\n" );
+// maybe do some CP437 <> UTF8 conversion?
+// should this be fwrite() to include any 0 bytes in case of UTF8 or binary data? is that possible in message in Squish?
+        fprintf( OutFile, "%s\n", NotifyUsers[i].msg_text );
+        fprintf( OutFile, "\n" );
+        fprintf( OutFile, "-\n" );
+        fprintf( OutFile, "\n" );
+        fprintf( OutFile, "Manage your email notification settings on the \"Change setup\" menu on Another Millennium BBS another.tel\n" );
+        fprintf( OutFile, "If you want to prevent all future emails from Another Millennium BBS, reply with \"unsubscribe\".\n" );
+
         fclose( OutFile );
 
         do
@@ -363,7 +476,7 @@ int search_for_new_mail( MAREA *marea,
             if( OutFile )
                 fclose( OutFile );
             file_idx++;
-            sprintf( OutFilename_emo, "%s%08lX.EMO", OutFilename, SquishHash( NotifyUsers[i].email ) + file_idx );
+            sprintf( OutFilename_emo, "%s%08lX.EMO", OutFilename, SquishHash( MailUsers[NotifyUsers[i].useridx].email ) + file_idx );
             OutFile = fopen( OutFilename_emo, "rt" );
         }while( OutFile );
 
@@ -371,6 +484,20 @@ int search_for_new_mail( MAREA *marea,
         {
             printf( "error - unable to rename '%s' to '%s'.\n", OutFilename_eao, OutFilename_emo );
         }
+        
+        if( NotifyUsers[i].msg_text )
+            free( NotifyUsers[i].msg_text );
+        NotifyUsers[i].msg_text = NULL;
+        NotifyUsers[i].msg_len = 0;
+        if( NotifyUsers[i].echo_tag )
+            free( NotifyUsers[i].echo_tag );
+        NotifyUsers[i].echo_tag = NULL;
+        if( NotifyUsers[i].area_name )
+            free( NotifyUsers[i].area_name );
+        NotifyUsers[i].area_name = NULL;
+        if( NotifyUsers[i].area_descript )
+            free( NotifyUsers[i].area_descript );
+        NotifyUsers[i].area_descript = NULL;
     }
 
 
