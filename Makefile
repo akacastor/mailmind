@@ -37,7 +37,7 @@ most :  $(exes) .SYMBOLIC
         @%null
 
 mailmind.exe : mailmind.obj
-        wlink $(LNKOPT) option map option stack=8192 name mailmind file mailmind lib ../squish/lib/wc_dos_l.lib
+        wlink $(LNKOPT) option map option stack=8192 name mailmind file mailmind lib squish/lib/wc_dos_l.lib
 
 
 run_all:    .SYMBOLIC
